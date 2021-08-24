@@ -15,12 +15,11 @@ class LoadingButton @JvmOverloads constructor(
     private var widthSize = 0
     private var heightSize = 0
 //    private var animator: ValueAnimator = ValueAnimator.ofInt(0, 100)
-    var buttonAnimator = ValueAnimator.ofFloat(0F, widthSize.toFloat()).apply {
+    var buttonAnimator = ValueAnimator.ofFloat(0F, 100F).apply {
         duration = 1000
         addUpdateListener { valueAnimator ->
             progressArc = valueAnimator.animatedValue as Float
             valueAnimator.repeatCount = ValueAnimator.INFINITE
-            valueAnimator.repeatMode = ValueAnimator.REVERSE
             valueAnimator.interpolator = LinearInterpolator()
             this@LoadingButton.invalidate() // -> Important
         }
@@ -87,9 +86,9 @@ class LoadingButton @JvmOverloads constructor(
                 0f, 0f,
                 (width * (progress / 100)).toFloat(), height.toFloat(), paint
             )
+            paint.color = Color.parseColor("#F9A825")
+            canvas.drawArc(rect, 0f, (360 * (progressArc / 100)), true, paint)
         }
-        paint.color = Color.parseColor("#F9A825")
-        canvas.drawArc(rect, 0f, (360 * (progressArc / 100)).toFloat(), true, paint)
 
         val buttonText =
             if (buttonState == ButtonState.Loading)

@@ -3,12 +3,58 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.constraintlayout.motion.widget.MotionLayout
+        android:id="@+id/detail_motion_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:context=".DetailActivity"
-        tools:showIn="@layout/activity_detail">
+        android:padding="18dp"
+        app:layoutDescription="@xml/activity_detail_scene">
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:id="@+id/file_name_header"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="54dp"
+            android:gravity="center"
+            android:text="@string/fileName"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/file_name_textView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="54dp"
+            android:gravity="center"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="24sp"
+            tools:text="@string/radioText" />
+
+        <TextView
+            android:id="@+id/status_header"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="44dp"
+            android:gravity="center"
+            android:text="@string/status"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/status_textView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="44dp"
+            android:gravity="center"
+            android:textSize="24sp"
+            tools:text="Fail" />
+
+        <Button
+            android:id="@+id/okay_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimaryDark"
+            android:text="@string/okay_button"
+            android:textColor="@color/white"
+            android:textSize="18sp" />
+
+    </androidx.constraintlayout.motion.widget.MotionLayout>
 </layout>

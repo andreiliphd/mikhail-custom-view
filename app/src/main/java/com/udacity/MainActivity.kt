@@ -1,6 +1,7 @@
 package com.udacity
 
 import android.app.DownloadManager
+import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.*
@@ -14,6 +15,7 @@ import android.widget.RadioButton
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import com.udacity.databinding.ActivityMainBinding
 import com.udacity.databinding.ContentMainBinding
 import kotlinx.coroutines.CoroutineScope
@@ -70,6 +72,7 @@ class MainActivity : AppCompatActivity() {
         bindingInclude.customButton.setOnClickListener {
             radioGroup()
         }
+        createNotificationChannel("1",this)
     }
 
     private val receiver = object : BroadcastReceiver() {
@@ -121,12 +124,13 @@ class MainActivity : AppCompatActivity() {
             downloadManager.enqueue(request)// enqueue puts the download request in the queue.
         scope.launch {
             // New coroutine that can call suspend functions
+            var query: DownloadManager.Query
+            var c: Cursor
             while (true) {
                 delay(TimeUnit.MILLISECONDS.toMillis(500))
-                val query = DownloadManager.Query()
+                query = DownloadManager.Query()
                 query.setFilterById(downloadID)
-
-                val c: Cursor = downloadManager.query(query)
+                c = downloadManager.query(query)
                 if (c.moveToFirst()) {
                     val sizeIndex: Int = c.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES)
                     val downloadedIndex: Int =
@@ -144,40 +148,64 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
+            val status = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS))
+            if (status == DownloadManager.STATUS_SUCCESSFUL) {
+                sendNotification(applicationContext, url, "Success")
+            } else {
+                sendNotification(applicationContext, url, "Failed")
+            }
+
+        }
+    }
+    fun createNotificationChannel(channelId: String, context: Context) {
+
+        val notificationChannel = NotificationChannel(
+            channelId,
+            "Load App",
+            NotificationManager.IMPORTANCE_DEFAULT
+        )
+
+        notificationChannel.apply {
+            setShowBadge(true)
+            description = "Loading App Download Notification"
         }
 
-
-
-
-//        fun ContentResolver.registerObserver(
-//            uri: Uri,
-//            observer: (selfChange: Boolean) -> Unit
-//        ): ContentObserver {
-//            // 1
-//            val contentObserver = object : ContentObserver(Handler()) {
-//                override fun onChange(selfChange: Boolean) {
-//                    observer(selfChange)
-//                    Log.i("observer", selfChange.toString())
-//                }
-//            }
-//            // 2
-//            registerContentObserver(parsed, true, contentObserver)
-//            return contentObserver
-//        }
-//        contentResolver.registerContentObserver(myDownloads, true, DownloadObserver())
-
+        val notificationManager = context.getSystemService(NotificationManager::class.java)
+        notificationManager.createNotificationChannel(notificationChannel)
     }
 
-    object RepeatHelper {
-        fun repeatDelayed(delay: Long, todo: () -> Unit) {
-            val handler = Handler()
-            handler.postDelayed(object : Runnable {
-                override fun run() {
-                    todo()
-                    handler.postDelayed(this, delay)
-                }
-            }, delay)
+
+    fun sendNotification(context: Context, fileName: String, status: String) {
+        val notificationIntent = Intent(context, DetailActivity::class.java).apply {
+            flags =
+                Intent.FLAG_ACTIVITY_CLEAR_TOP
+            putExtra("FILE_NAME", fileName)
+            putExtra("STATUS", status)
         }
+        val pendingIntent = PendingIntent.getActivity(
+            context,
+            0,
+            notificationIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT)
+
+        val notification = context.let {
+            NotificationCompat.Builder(it,"1")
+                .setSmallIcon(R.drawable.ic_assistant_black_24dp)
+                .setContentTitle("Load App")
+                .setContentText("Your Download Has Completed")
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setCategory(NotificationCompat.CATEGORY_MESSAGE)
+                .setAutoCancel(true)
+                .setContentIntent(pendingIntent)
+                .addAction(
+                    R.drawable.ic_launcher_background, "Notification action",
+                    pendingIntent
+                )
+                .build()
+        }
+
+        val notificationManagerCompat = NotificationManagerCompat.from(context)
+        notificationManagerCompat.notify(1, notification)
     }
 
         companion object {
