@@ -6,6 +6,7 @@ import android.graphics.*
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
+import android.view.animation.LinearInterpolator
 import kotlin.properties.Delegates
 
 class LoadingButton @JvmOverloads constructor(
@@ -13,7 +14,19 @@ class LoadingButton @JvmOverloads constructor(
 ) : View(context, attrs, defStyleAttr) {
     private var widthSize = 0
     private var heightSize = 0
-    private var animator: ValueAnimator = ValueAnimator.ofInt(0, 100)
+//    private var animator: ValueAnimator = ValueAnimator.ofInt(0, 100)
+    var buttonAnimator = ValueAnimator.ofFloat(0F, widthSize.toFloat()).apply {
+        duration = 1000
+        addUpdateListener { valueAnimator ->
+            progressArc = valueAnimator.animatedValue as Float
+            valueAnimator.repeatCount = ValueAnimator.INFINITE
+            valueAnimator.repeatMode = ValueAnimator.REVERSE
+            valueAnimator.interpolator = LinearInterpolator()
+            this@LoadingButton.invalidate() // -> Important
+        }
+        start()
+    }
+
     private var progress: Float = 0.0f
     private var progressArc: Float = 0.0f
 
@@ -22,22 +35,22 @@ class LoadingButton @JvmOverloads constructor(
     }
 
     init {
-        animator.setDuration(500);
-        animator.addUpdateListener { animation ->
-            progressArc = animation.animatedValue as Float
-        }
+//        animator.setDuration(500);
+//        animator.addUpdateListener { animation ->
+//            progressArc = animation.animatedValue as Float
+//        }
 
     }
 
     fun setProgressValue(progress: Float) {
         buttonState = ButtonState.Loading
-        animator.start()
+//        animator.start()
         this.progress = progress
         invalidate()
     }
 
     fun setDownloadComplete() {
-        animator.cancel()
+//        animator.cancel()
         buttonState = ButtonState.Completed
     }
 
@@ -74,9 +87,10 @@ class LoadingButton @JvmOverloads constructor(
                 0f, 0f,
                 (width * (progress / 100)).toFloat(), height.toFloat(), paint
             )
-            paint.color = Color.parseColor("#F9A825")
-            canvas.drawArc(rect, 0f, (360 * (progressArc / 100)).toFloat(), true, paint)
         }
+        paint.color = Color.parseColor("#F9A825")
+        canvas.drawArc(rect, 0f, (360 * (progressArc / 100)).toFloat(), true, paint)
+
         val buttonText =
             if (buttonState == ButtonState.Loading)
                 "Loading"

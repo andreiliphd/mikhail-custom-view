@@ -40,6 +40,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         bindingInclude = binding.contentMainId
         setContentView(binding.root)
+        setSupportActionBar(binding.toolbar)
 
 
 //        val binding: ActivityMainBinding = DataBindingUtil.setContentView(
