@@ -43,19 +43,20 @@ class LoadingButton @JvmOverloads constructor(
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         paint.strokeWidth = 0f
-        paint.color = Color.BLUE
+        paint.color = Color.parseColor("#00A5D9")
         canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), paint)
 
         buttonState = ButtonState.Loading
         if (buttonState == ButtonState.Loading) {
-            Log.i("custom-button", "executing")
-            paint.color = Color.BLACK
+            Log.i("custom-button", width.toString())
+            Log.i("custom-calc", (90/100).toFloat().toString())
+            paint.color = Color.parseColor("#0085CC")
             canvas.drawRect(
                 0f, 0f,
-                (width * (90 / 100)).toFloat(), height.toFloat(), paint
+                (width * (90f / 100)).toFloat(), height.toFloat(), paint
             )
-//            paint.color = Color.parseColor("#F9A825")
-//            canvas.drawArc(rect, 0f, (360 * (20 / 100)).toFloat(), true, paint)
+            paint.color = Color.parseColor("#F9A825")
+            canvas.drawArc(rect, 0f, (360 * (70f / 100)).toFloat(), true, paint)
         }
         val buttonText = "Loading1"
         paint.color = Color.BLACK

@@ -7,30 +7,43 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.content_main.*
+import androidx.databinding.DataBindingUtil
+import com.udacity.databinding.ActivityMainBinding
+import com.udacity.databinding.ContentMainBinding
 
 
 class MainActivity : AppCompatActivity() {
 
     private var downloadID: Long = 0
 
+    private lateinit var binding: ActivityMainBinding
+    private lateinit var bindingInlcude: ContentMainBinding
     private lateinit var notificationManager: NotificationManager
     private lateinit var pendingIntent: PendingIntent
     private lateinit var action: NotificationCompat.Action
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        setSupportActionBar(toolbar)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        bindingInlcude = ContentMainBinding.bind(binding.root)
+        setContentView(binding.root)
 
+//        val binding: ActivityMainBinding = DataBindingUtil.setContentView(
+//            this, R.layout.activity_main)
+        if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            requestPermissions(arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE),0)
+        }
         registerReceiver(receiver, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
 
-        custom_button.setOnClickListener {
+        bindingInlcude.customButton.setOnClickListener {
             download()
         }
     }
