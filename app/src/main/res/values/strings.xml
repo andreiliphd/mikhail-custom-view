@@ -15,4 +15,5 @@
     <string name="textRetrofit">Retrofit</string>
     <string name="textProject3">Udacity Project 3</string>
     <string name="textGlide">Glide</string>
+    <string name="textPytorch">Pytorch</string>
 </resources>

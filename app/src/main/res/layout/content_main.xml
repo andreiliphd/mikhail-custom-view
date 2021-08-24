@@ -38,6 +38,12 @@
                 android:layout_height="wrap_content"
                 android:text="@string/textRetrofit" />
 
+            <RadioButton
+                android:id="@+id/pytorch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/textPytorch" />
+
         </RadioGroup>
 
         <com.udacity.LoadingButton

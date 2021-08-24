@@ -18,7 +18,9 @@ import com.udacity.databinding.ActivityMainBinding
 import com.udacity.databinding.ContentMainBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
 
 
 class MainActivity : AppCompatActivity() {
@@ -92,6 +94,9 @@ class MainActivity : AppCompatActivity() {
 //                    downloadFileName = getString(R.string.loadApp_radio_button_text)
                     download(project)
                 }
+                bindingInclude.pytorch -> {
+                    download(pytorch)
+                }
                 else -> {
 //                    downloadFileName = getString(R.string.retrofit_radio_button_text)
                     download(retrofit)
@@ -116,7 +121,7 @@ class MainActivity : AppCompatActivity() {
         scope.launch {
             // New coroutine that can call suspend functions
             while (true) {
-                Log.i("download", url)
+                delay(TimeUnit.MILLISECONDS.toMillis(500))
                 val query = DownloadManager.Query()
                 query.setFilterById(downloadID)
 
@@ -125,13 +130,17 @@ class MainActivity : AppCompatActivity() {
                     val sizeIndex: Int = c.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES)
                     val downloadedIndex: Int =
                         c.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR)
-                    val size: Long = c.getInt(sizeIndex).toLong()
-                    val downloaded: Long = c.getInt(downloadedIndex).toLong()
-                    var progress = 0.0
-                    if (size != -1L) progress = downloaded * 100.0 / size
+                    val size: Float = c.getInt(sizeIndex).toFloat()
+                    val downloaded: Float = c.getInt(downloadedIndex).toFloat()
+                    var progress = 0.0f
+                    if (size != -1.0f) progress = downloaded * 100.0f / size
                     // At this point you have the progress as a percentage.
+                    bindingInclude.customButton.setProgressValue(progress)
                     Log.i("progress", progress.toString())
-                    if (progress == 100.0) break
+                    if (progress >= 100.0f) {
+                        bindingInclude.customButton.setDownloadComplete()
+                        break
+                    }
                 }
             }
         }
@@ -177,6 +186,8 @@ class MainActivity : AppCompatActivity() {
             "https://github.com/udacity/nd940-c3-advanced-android-programming-project-starter/archive/master.zip"
         private const val retrofit =
             "https://github.com/square/retrofit/archive/master.zip"
+        private const val pytorch =
+            "https://github.com/pytorch/pytorch/archive/master.zip"
 
         private const val CHANNEL_ID = "channelId"
     }

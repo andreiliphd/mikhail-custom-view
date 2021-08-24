@@ -13,13 +13,34 @@ class LoadingButton @JvmOverloads constructor(
 ) : View(context, attrs, defStyleAttr) {
     private var widthSize = 0
     private var heightSize = 0
-    private val valueAnimator = ValueAnimator()
+    private var animator: ValueAnimator = ValueAnimator.ofInt(0, 100)
+    private var progress: Float = 0.0f
+    private var progressArc: Float = 0.0f
+
     private var buttonState: ButtonState by Delegates.observable<ButtonState>(ButtonState.Completed) { p, old, new ->
 
     }
 
     init {
+        animator.setDuration(500);
+        animator.addUpdateListener { animation ->
+            progressArc = animation.animatedValue as Float
+        }
+
     }
+
+    fun setProgressValue(progress: Float) {
+        buttonState = ButtonState.Loading
+        animator.start()
+        this.progress = progress
+        invalidate()
+    }
+
+    fun setDownloadComplete() {
+        animator.cancel()
+        buttonState = ButtonState.Completed
+    }
+
 
     override fun performClick(): Boolean {
         super.performClick()
@@ -45,20 +66,21 @@ class LoadingButton @JvmOverloads constructor(
         paint.strokeWidth = 0f
         paint.color = Color.parseColor("#00A5D9")
         canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), paint)
-
-        buttonState = ButtonState.Loading
         if (buttonState == ButtonState.Loading) {
             Log.i("custom-button", width.toString())
             Log.i("custom-calc", (90/100).toFloat().toString())
             paint.color = Color.parseColor("#0085CC")
             canvas.drawRect(
                 0f, 0f,
-                (width * (90f / 100)).toFloat(), height.toFloat(), paint
+                (width * (progress / 100)).toFloat(), height.toFloat(), paint
             )
             paint.color = Color.parseColor("#F9A825")
-            canvas.drawArc(rect, 0f, (360 * (70f / 100)).toFloat(), true, paint)
+            canvas.drawArc(rect, 0f, (360 * (progressArc / 100)).toFloat(), true, paint)
         }
-        val buttonText = "Loading1"
+        val buttonText =
+            if (buttonState == ButtonState.Loading)
+                "Loading"
+            else "Download"
         paint.color = Color.BLACK
         canvas.drawText(buttonText, (width / 2).toFloat(), ((height + 30) / 2).toFloat(),
             paint)
