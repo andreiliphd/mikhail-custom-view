@@ -13,6 +13,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import com.udacity.databinding.ActivityMainBinding
 import com.udacity.databinding.ContentMainBinding
@@ -23,7 +24,7 @@ class MainActivity : AppCompatActivity() {
     private var downloadID: Long = 0
 
     private lateinit var binding: ActivityMainBinding
-    private lateinit var bindingInlcude: ContentMainBinding
+    private lateinit var bindingInclude: ContentMainBinding
     private lateinit var notificationManager: NotificationManager
     private lateinit var pendingIntent: PendingIntent
     private lateinit var action: NotificationCompat.Action
@@ -31,19 +32,35 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
-        bindingInlcude = ContentMainBinding.bind(binding.root)
+        bindingInclude = binding.contentMainId
         setContentView(binding.root)
+
 
 //        val binding: ActivityMainBinding = DataBindingUtil.setContentView(
 //            this, R.layout.activity_main)
+//        when {
+//            ContextCompat.checkSelfPermission(
+//                applicationContext,
+//                android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+//            ) == PackageManager.PERMISSION_GRANTED -> {
+//                // You can use the API that requires the permission.
+//            }
+//        }
+//            else -> {
+//                // You can directly ask for the permission.
+//                // The registered ActivityResultCallback gets the result of this request.
+//                requestPermissionLauncher.launch(
+//                    Manifest.permission.REQUESTED_PERMISSION)
+//            }
+//        }
+
         if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
             != PackageManager.PERMISSION_GRANTED
         ) {
             requestPermissions(arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE),0)
         }
         registerReceiver(receiver, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
-
-        bindingInlcude.customButton.setOnClickListener {
+        bindingInclude.customButton.setOnClickListener {
             download()
         }
     }
