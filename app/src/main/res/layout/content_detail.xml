@@ -51,7 +51,7 @@
             android:id="@+id/okay_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/colorPrimaryDark"
+            android:background="@color/colorButton"
             android:text="@string/okay_button"
             android:textColor="@color/white"
             android:textSize="18sp" />
