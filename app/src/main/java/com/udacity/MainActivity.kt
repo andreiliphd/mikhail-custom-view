@@ -3,20 +3,22 @@ package com.udacity
 import android.app.DownloadManager
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
+import android.content.*
 import android.content.pm.PackageManager
+import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
-import android.view.View
+import android.os.Handler
+import android.util.Log
+import android.widget.RadioButton
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
-import androidx.core.content.ContextCompat
-import androidx.databinding.DataBindingUtil
 import com.udacity.databinding.ActivityMainBinding
 import com.udacity.databinding.ContentMainBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 class MainActivity : AppCompatActivity() {
@@ -28,6 +30,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var notificationManager: NotificationManager
     private lateinit var pendingIntent: PendingIntent
     private lateinit var action: NotificationCompat.Action
+    val scope = CoroutineScope(Dispatchers.IO)
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,7 +65,7 @@ class MainActivity : AppCompatActivity() {
         }
         registerReceiver(receiver, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
         bindingInclude.customButton.setOnClickListener {
-            download()
+            radioGroup()
         }
     }
 
@@ -70,10 +74,36 @@ class MainActivity : AppCompatActivity() {
             val id = intent?.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
         }
     }
+    private fun radioGroup() {
 
-    private fun download() {
+        if (bindingInclude.radioGroup.checkedRadioButtonId == -1) {
+            Toast.makeText(this, "Please, select an option.", Toast.LENGTH_LONG).show()
+
+        } else {
+            val selectedOption = bindingInclude.radioGroup.checkedRadioButtonId
+            val radioButton: RadioButton = findViewById(selectedOption)
+
+            when (radioButton) {
+                bindingInclude.glide -> {
+//                    downloadFileName = getString(R.string.glide_radio_button_text)
+                    download(glide)
+                }
+                bindingInclude.project3 -> {
+//                    downloadFileName = getString(R.string.loadApp_radio_button_text)
+                    download(project)
+                }
+                else -> {
+//                    downloadFileName = getString(R.string.retrofit_radio_button_text)
+                    download(retrofit)
+                }
+            }
+        }
+    }
+
+    private fun download(url: String) {
+        var parsed = Uri.parse(url)
         val request =
-            DownloadManager.Request(Uri.parse(URL))
+            DownloadManager.Request(parsed)
                 .setTitle(getString(R.string.app_name))
                 .setDescription(getString(R.string.app_description))
                 .setRequiresCharging(false)
@@ -83,11 +113,71 @@ class MainActivity : AppCompatActivity() {
         val downloadManager = getSystemService(DOWNLOAD_SERVICE) as DownloadManager
         downloadID =
             downloadManager.enqueue(request)// enqueue puts the download request in the queue.
+        scope.launch {
+            // New coroutine that can call suspend functions
+            while (true) {
+                Log.i("download", url)
+                val query = DownloadManager.Query()
+                query.setFilterById(downloadID)
+
+                val c: Cursor = downloadManager.query(query)
+                if (c.moveToFirst()) {
+                    val sizeIndex: Int = c.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES)
+                    val downloadedIndex: Int =
+                        c.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR)
+                    val size: Long = c.getInt(sizeIndex).toLong()
+                    val downloaded: Long = c.getInt(downloadedIndex).toLong()
+                    var progress = 0.0
+                    if (size != -1L) progress = downloaded * 100.0 / size
+                    // At this point you have the progress as a percentage.
+                    Log.i("progress", progress.toString())
+                    if (progress == 100.0) break
+                }
+            }
+        }
+
+
+
+
+//        fun ContentResolver.registerObserver(
+//            uri: Uri,
+//            observer: (selfChange: Boolean) -> Unit
+//        ): ContentObserver {
+//            // 1
+//            val contentObserver = object : ContentObserver(Handler()) {
+//                override fun onChange(selfChange: Boolean) {
+//                    observer(selfChange)
+//                    Log.i("observer", selfChange.toString())
+//                }
+//            }
+//            // 2
+//            registerContentObserver(parsed, true, contentObserver)
+//            return contentObserver
+//        }
+//        contentResolver.registerContentObserver(myDownloads, true, DownloadObserver())
+
     }
 
-    companion object {
-        private const val URL =
+    object RepeatHelper {
+        fun repeatDelayed(delay: Long, todo: () -> Unit) {
+            val handler = Handler()
+            handler.postDelayed(object : Runnable {
+                override fun run() {
+                    todo()
+                    handler.postDelayed(this, delay)
+                }
+            }, delay)
+        }
+    }
+
+        companion object {
+        private const val glide =
+            "https://github.com/bumptech/glide/archive/master.zip"
+        private const val project =
             "https://github.com/udacity/nd940-c3-advanced-android-programming-project-starter/archive/master.zip"
+        private const val retrofit =
+            "https://github.com/square/retrofit/archive/master.zip"
+
         private const val CHANNEL_ID = "channelId"
     }
 
