@@ -12,4 +12,7 @@
     <string name="button_loading">We are loading </string>
     <string name="title_activity_detail">DetailActivity</string>
     <string name="contentDescriptionDownloadImage">Download image</string>
+    <string name="textRetrofit">Retrofit</string>
+    <string name="textProject3">Udacity Project 3</string>
+    <string name="textGlide">Glide</string>
 </resources>
