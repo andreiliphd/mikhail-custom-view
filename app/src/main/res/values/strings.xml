@@ -12,6 +12,8 @@
     <string name="button_loading">We are loading </string>
     <string name="title_activity_detail">Udacity Dowloader</string>
     <string name="contentDescriptionDownloadImage">Download image</string>
+    <string name="colorButton">#0085CC</string>
+    <string name="colorText">#F9A825</string>
     <string name="radioText">Repository</string>
     <string name="status">Status:</string>
     <string name="fileName">File</string>

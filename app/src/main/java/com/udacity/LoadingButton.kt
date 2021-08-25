@@ -28,16 +28,26 @@ class LoadingButton @JvmOverloads constructor(
 
     private var progress: Float = 0.0f
     private var progressArc: Float = 0.0f
+    var colorButton: String?
+    var colorText: String?
 
     private var buttonState: ButtonState by Delegates.observable<ButtonState>(ButtonState.Completed) { p, old, new ->
 
     }
 
     init {
-//        animator.setDuration(500);
-//        animator.addUpdateListener { animation ->
-//            progressArc = animation.animatedValue as Float
-//        }
+        context.theme.obtainStyledAttributes(
+            attrs,
+            R.styleable.LoadingButton,
+            0, 0).apply {
+
+            try {
+                colorText = getString(R.styleable.LoadingButton_colorText)
+                colorButton = getString(R.styleable.LoadingButton_colorButton)
+            } finally {
+                recycle()
+            }
+        }
 
     }
 
@@ -81,12 +91,12 @@ class LoadingButton @JvmOverloads constructor(
         if (buttonState == ButtonState.Loading) {
             Log.i("custom-button", width.toString())
             Log.i("custom-calc", (90/100).toFloat().toString())
-            paint.color = Color.parseColor("#0085CC")
+            paint.color = Color.parseColor(colorButton)
             canvas.drawRect(
                 0f, 0f,
-                (width * (progress / 100)).toFloat(), height.toFloat(), paint
+                (width * (progress / 100)), height.toFloat(), paint
             )
-            paint.color = Color.parseColor("#F9A825")
+            paint.color = if (progress < 50) Color.BLACK else Color.parseColor(colorText)
             canvas.drawArc(rect, 0f, (360 * (progressArc / 100)), true, paint)
         }
 

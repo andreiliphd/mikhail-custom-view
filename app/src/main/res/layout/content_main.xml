@@ -52,6 +52,8 @@
             android:layout_height="60dp"
             android:layout_margin="20dp"
             android:background="@color/colorButton"
+            app:colorText="@string/colorText"
+            app:colorButton="@string/colorButton"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
